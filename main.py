@@ -200,11 +200,14 @@ def modify_m_line(subjectfile, question):
 
                 #Now print 2 lines below it.
                 m_line = lines[i+2].strip().lower()
+                # print("M LINE HERE:",m_line)
+                # print("LEN OF THIS :",len(m_line))
 
                 if len(m_line)< 3:
+                    # print("LEN M LINE:",len(m_line))
                     new_memory_cue = input('Input a memory cue that will help you remember this answer:')
                     new_memory_cue = 'M: '+ new_memory_cue +'\n'
-                    print("UNDER 3 len")
+                    # print("UNDER 3 len")
 
                     lines[i+2] = new_memory_cue  #INITIALIZe the line change
 
@@ -214,7 +217,8 @@ def modify_m_line(subjectfile, question):
 
 
                 else:
-                    print(m_line)
+                    print("Review your memory cue: ",m_line[3:])
+                    break
 
 
 
