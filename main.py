@@ -273,8 +273,8 @@ def track_num_of_times_answered_incorrect(subjectfile, question):
 
                             #If its greater then 10 then it has a number
                             if len(attempt_line)> 10:
-                                print("ATTEMPTS LINE:",attempt_line)
-                                print("len attempt",len(attempt_line))
+                                # print("ATTEMPTS LINE:",attempt_line)
+                                # print("len attempt",len(attempt_line))
                                 #MODIFY THE LINE
 
 
@@ -293,7 +293,7 @@ def track_num_of_times_answered_incorrect(subjectfile, question):
 
                             
                                 addblankspaces(3)
-                                print("INCORRECT NUM: ",attempts_num)
+                                # print("INCORRECT NUM: ",attempts_num)
                                 return attempts_num -1
                         break
                     t_index += 1
@@ -334,7 +334,7 @@ def track_num_of_times_answered_correct(subjectfile, question):
                             attempt_line = lines[t_index].strip() # PRINTS THE LINE
                             print("Correct_LINE:",attempt_line)
                             attempts_num = attempt_line[9:]
-                            print("ATTEMPTS NUM:",attempts_num)
+                            # print("ATTEMPTS NUM:",attempts_num)
                             attempts_num = int(attempts_num)
                             attempts_num += 1
                             new_attempts_num = str(attempts_num)
@@ -345,7 +345,7 @@ def track_num_of_times_answered_correct(subjectfile, question):
                             with open(subjectfile, 'w') as file:  #finalyze the line change
                                 file.writelines(lines)
 
-                            print("Correct:",attempts_num)
+                            # print("Correct:",attempts_num)
                             addblankspaces(3)
                             return attempts_num -1
                         break
@@ -424,7 +424,7 @@ def check_how_many_times_answered_correct(subjectfile, question):
                         if t_index+2 < len(lines): #Gets the amount of attempts done already and adds 1 to it.
                             attempt_line = lines[t_index].strip() # PRINTS THE LINE
                             attempts_num = attempt_line[9:]
-                            print("ATTEMPTS NUM:",attempts_num)
+                            # print("ATTEMPTS NUM:",attempts_num)
                             attempts_num = int(attempts_num)
                         
                             return attempts_num
@@ -509,7 +509,7 @@ def ask_questions():
                 else:
                     # WRITES IT TO MISES WORKING
                     add_missed_question(subjectfile, current_question, correct_answer)
-                    print('Incorrect! The correct answer is:', correct_answer)
+                    print('Incorrect! A: ', correct_answer)
                     addblankspaces(1)
                     wrong_answers_dic[current_question] = correct_answer
                     #SAVE INCORRECTION QUESTIONS in new file to repeat until they are correct.
@@ -523,7 +523,8 @@ def ask_questions():
 
                     ###NOW HAVE IT REPEAT THIS QUESTION 3x
                     print("Since you missed this question it will repeat for memory")
-                    for i in range(1):
+                    for i in range(3):
+                        addblankspaces(3)
                         print(str(question_count)+ ':',current_question.capitalize())
                         # Ask the user for an answer
                         user_answer = input('Your answer: ') 
@@ -594,6 +595,8 @@ ask_questions()
 #  
 
 #OTHER
+
+# have questions emailed to me
 ## Choose new questions so i get x amount of questions new 
 ## this way i get to keep learning new and avoid too many repeats
 ##  If I have no attempts then it means Its new or I never got it wrong
