@@ -22,6 +22,10 @@ def inital_options():
     print("3. Repeat Challenging questions")
     addblankspaces(3)
     initialanswer = input("Enter your choice (1/2/3): ")
+
+    if initialanswer == '1':
+        print("This function has not been built yet, please choose another!")
+        initialanswer = input("Enter your choice (1/2/3): ")
     addblankspaces(3)
     return initialanswer
    
@@ -40,10 +44,15 @@ def option2section():
         file_name_list = []
         for file_name in os.listdir(path):  # takes off the txt on the end 
             num += 1
+       
+            if file_name == 'missed': # to avoid it from getting the missed folder
+                num -= 1
+                continue
             stripped_word = file_name.split('.', 1)[0]  # Split at first occurrence of '.' and select second part
             file_name_option = str(num) + ': ' + stripped_word
             print(file_name_option)
             # Output: 'txt'
+       
             file_name_list.append(file_name_option)
         subjectanswer = input("Enter your choice: ")   
         addblankspaces(5)
@@ -121,7 +130,31 @@ if selected_option == '3':
                     print("Great lets begin studying:",file_subject+'.'," You will master 7 questions at a time before moving to the next set of 7 questions. ")
                     addblankspaces(8)
     
- 
+def add_memorycue_incorrect_correct(input_file):
+    with open(input_file, 'r') as f:
+        lines = f.readlines()
+
+    new_lines = []
+    for i, line in enumerate(lines):
+        new_lines.append(line)
+
+        if line.startswith("A:"):
+            if (i + 1 >= len(lines) or
+                not (lines[i + 1].startswith("M:") and
+                     lines[i + 2].startswith("Incorrect:") and
+                     lines[i + 3].startswith("Correct:"))):
+                
+                new_lines.append("M: \n")
+                new_lines.append("Incorrect: 0\n")
+                new_lines.append("Correct: 0\n")
+                new_lines.append("\n")
+
+    with open(input_file, 'w') as f:
+        f.writelines(new_lines)
+
+
+add_memorycue_incorrect_correct(subjectfile)
+
 
 wrong_answers_dic = {}
 all_questions_answers_dic = {}
@@ -150,59 +183,59 @@ def add_questions_answers_to_dic():
 
 
 #Used to check if memoryque is recorded.. if not it will add it in the ask questions function
-def modify_file(subjectfile, question):
+def modify_m_line(subjectfile, question):
     # Read the lines from the file
     with open(subjectfile, 'r') as f:
         lines = f.readlines()
 
     # Loop through the lines and find the question
     for i, line in enumerate(lines):
-       
-        
-        if line.strip().lower().startswith('q: '):
-            # print("QUESTION:",question)
-            
+        if line.strip().lower().startswith('q: '): # finds question
             questionline = line[3:].strip().lower()
-            # print("QUESTOINLINE:",questionline)
+       
             if question in questionline:
-                    
-                # Find the answer line
+                # Find the Attempts line
                 answer_index = i + 1
-                while not lines[answer_index].strip().startswith('A: '):
-                    answer_index += 1
+                #THIS IS WORKING
 
-                # Check if the T line already exists
-                t_index = answer_index + 1
-                t_exists = False
-                while t_index < len(lines) and lines[t_index].strip():
+                #Now print 2 lines below it.
+                m_line = lines[i+2].strip().lower()
 
-                    if lines[t_index].strip().startswith('M: '):
-                        t_exists = True
+                if len(m_line)< 3:
+                    new_memory_cue = input('Input a memory cue that will help you remember this answer:')
+                    new_memory_cue = 'M: '+ new_memory_cue +'\n'
+                    print("UNDER 3 len")
 
-                        if t_index < len(lines): 
-                            print("TAKE A MOMENT TO REMEMBER MEMORY QUE")
-                            addblankspaces(2) 
-                            print(lines[t_index].strip()) # PRINTS THE LINE
-                            addblankspaces(3)
-                        break
-                    t_index += 1
+                    lines[i+2] = new_memory_cue  #INITIALIZe the line change
 
-                # Insert the new text line after the answer line if it doesn't already exist
-                if not t_exists:
-                    print("")
-                    memoryque = input("What does this word sound like or remind you of?")
-                    print("")
-                    new_line = 'M: ' + memoryque + '\n'
-                    lines.insert(answer_index + 1, new_line)
+                    with open(subjectfile, 'w') as file:  #finalyze the line change
+                        file.writelines(lines)
+                    break
 
-                    # Insert a blank line after the new text line
-                    lines.insert(answer_index + 2, '\n')
 
-                    # Write the modified lines back to the file
-                    with open(subjectfile, 'w') as f:
-                        f.writelines(lines)
-            
-                break
+                else:
+                    print(m_line)
+
+
+
+
+
+             
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## USING THIS TO TRACK HOW MANY TIMES A QUESTION IS DONE WRONG
 def track_num_of_times_answered_incorrect(subjectfile, question):
@@ -224,15 +257,15 @@ def track_num_of_times_answered_incorrect(subjectfile, question):
 
                 # Check if the T line already exists
                 t_index = answer_index + 2
-                print("T INDEX:",t_index)
-                t_exists = False
+            
+               
                 while t_index < len(lines) and lines[t_index].strip():
                     if lines[t_index].strip().startswith('Incorrect: '):
-                        t_exists = True
+                       
 
                         if t_index < len(lines): #Gets the amount of attempts done already and adds 1 to it.
                             attempt_line = lines[t_index].strip() # PRINTS THE LINE
-                            print("Attempt_LINE:",attempt_line)
+                       
                             attempts_num = attempt_line[10:]
                             attempts_num = int(attempts_num)
                             attempts_num += 1
@@ -244,25 +277,12 @@ def track_num_of_times_answered_incorrect(subjectfile, question):
                             with open(subjectfile, 'w') as file:  #finalyze the line change
                                 file.writelines(lines)
 
-                            print("attemptsNum:",attempts_num)
+                        
                             addblankspaces(3)
                             return attempts_num -1
                         break
                     t_index += 1
 
-                # Insert the new text line after the answer line if it doesn't already exist
-                if not t_exists:
-                    new_line = 'Incorrect: ' + '1' 
-                    lines.insert(answer_index + 2, new_line)
-
-                    # Insert a blank line after the new text line
-                    # lines.insert(answer_index + 3, '\n')
-
-                    # Write the modified lines back to the file
-                    with open(subjectfile, 'w') as f:
-                        f.writelines(lines)
-                    return 1  #return value of 1 since i only used it once
-            
                 break
 
 def track_num_of_times_answered_correct(subjectfile, question):
@@ -285,16 +305,14 @@ def track_num_of_times_answered_correct(subjectfile, question):
 
                 # Check if the T line already exists
                 t_index = answer_index + 3
-                print("T INDEX:",t_index)
-                print("LEN LINES:S:",len(lines))
+            
                 t_exists = False
           
                 while t_index < len(lines) and lines[t_index].strip():
                 
-                    print("HERES LINE1:",lines[t_index])
+                 
                     if lines[t_index].strip().startswith('Correct: '):
-                        print("HERES LIN2E:",lines[t_index])
-                        print("LEN LINES:",len(lines))
+                   
                         t_exists = True
 
                         if t_index+2 < len(lines): #Gets the amount of attempts done already and adds 1 to it.
@@ -318,19 +336,6 @@ def track_num_of_times_answered_correct(subjectfile, question):
                         break
                     t_index += 1
 
-                # Insert the new text line after the answer line if it doesn't already exist
-                if not t_exists:
-                    print("does not exist")
-                    new_line = 'Correct: ' + '1' 
-                    lines.insert(answer_index + 3, new_line)
-
-                    # Insert a blank line after the new text line
-                    lines.insert(answer_index + 4, '\n')
-
-                    # Write the modified lines back to the file
-                    with open(subjectfile, 'w') as f:
-                        f.writelines(lines)
-                    return 1
                 break
 
 
@@ -498,7 +503,7 @@ def ask_questions():
                     
                     ## RETREAVE MEMORY QUE if its their, if not it will ask user for it and add it.
                     # #not adding it in the dictionary because it might not exist and or have duplicates the dic would delete 
-                    modify_file(subjectfile, current_question)
+                    modify_m_line(subjectfile,current_question)
                     track_num_of_times_answered_incorrect(subjectfile, current_question)
 
                     ###NOW HAVE IT REPEAT THIS QUESTION 3x
@@ -611,3 +616,8 @@ ask_questions()
 # SO IF I WANT TO MASTER 4000 ITEMS i MUST GET THEM ALL CORRECT AT LEAST 7X EACH.
 ## MY CONCLUSION IS TO USE THIS PROGRAM AND SEE WHEN IT BECOMES TOO MUCHA ND THEN AND ONLY THEN MAKE MODIFICATIONS TO THE CODE
 # KEEP IT SIMPLE AND SEE IF IT WORKS FIRST
+
+
+# next i can add a timestamp function to track when i studied that material so i can do more
+
+# REMEMBER THe goal is to create something that helps me put information fast and effectively into my long term memory.
