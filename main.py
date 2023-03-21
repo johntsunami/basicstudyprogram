@@ -130,6 +130,7 @@ if selected_option == '3':
                     print("Great lets begin studying:",file_subject+'.'," You will master 7 questions at a time before moving to the next set of 7 questions. ")
                     addblankspaces(8)
     
+    #used to add the format onto the question if it doesn't exist
 def add_memorycue_incorrect_correct(input_file):
     with open(input_file, 'r') as f:
         lines = f.readlines()
@@ -264,26 +265,36 @@ def track_num_of_times_answered_incorrect(subjectfile, question):
             
                
                 while t_index < len(lines) and lines[t_index].strip():
-                    if lines[t_index].strip().startswith('Incorrect: '):
+                    if lines[t_index].strip().startswith('Incorrect:'):
                        
 
                         if t_index < len(lines): #Gets the amount of attempts done already and adds 1 to it.
                             attempt_line = lines[t_index].strip() # PRINTS THE LINE
-                       
-                            attempts_num = attempt_line[10:]
-                            attempts_num = int(attempts_num)
-                            attempts_num += 1
-                            new_attempts_num = str(attempts_num)
-            
-                            new_attempts_line = "Incorrect: "+ new_attempts_num + '\n'
-                            lines[t_index] = new_attempts_line  #INITIALIZe the line change
 
-                            with open(subjectfile, 'w') as file:  #finalyze the line change
-                                file.writelines(lines)
+                            #If its greater then 10 then it has a number
+                            if len(attempt_line)> 10:
+                                print("ATTEMPTS LINE:",attempt_line)
+                                print("len attempt",len(attempt_line))
+                                #MODIFY THE LINE
 
-                        
-                            addblankspaces(3)
-                            return attempts_num -1
+
+
+                            
+                                attempts_num = attempt_line[10:]
+                                attempts_num = int(attempts_num)
+                                attempts_num += 1
+                                new_attempts_num = str(attempts_num)
+                
+                                new_attempts_line = "Incorrect: "+ new_attempts_num + '\n'
+                                lines[t_index] = new_attempts_line  #INITIALIZe the line change
+
+                                with open(subjectfile, 'w') as file:  #finalyze the line change
+                                    file.writelines(lines)
+
+                            
+                                addblankspaces(3)
+                                print("INCORRECT NUM: ",attempts_num)
+                                return attempts_num -1
                         break
                     t_index += 1
 
